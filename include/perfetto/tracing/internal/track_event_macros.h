@@ -118,24 +118,23 @@
 // if so, emits one trace event with the given arguments.
 #define PERFETTO_INTERNAL_TRACK_EVENT(category, name, ...)                     \
   do {                                                                         \
-    perfetto::internal::ValidateEventNameType<decltype(name)>();               \
-    namespace tns = ::PERFETTO_TRACK_EVENT_NAMESPACE;                          \
+    ::perfetto::internal::ValidateEventNameType<decltype(name)>();             \
     /* Compute the category index outside the lambda to work around a */       \
     /* GCC 7 bug */                                                            \
     static constexpr auto PERFETTO_UID(                                        \
         kCatIndex_ADD_TO_PERFETTO_DEFINE_CATEGORIES_IF_FAILS_) =               \
         PERFETTO_GET_CATEGORY_INDEX(category);                                 \
-    if (tns::internal::IsDynamicCategory(category)) {                          \
-      tns::TrackEvent::CallIfEnabled(                                          \
+    if (::perfetto::internal::IsDynamicCategory(category)) {                   \
+      ::perfetto::TrackEvent::CallIfEnabled(                                   \
           [&](uint32_t instances) PERFETTO_NO_THREAD_SAFETY_ANALYSIS {         \
-            tns::TrackEvent::TraceForCategory(instances, category, name,       \
+            ::perfetto::TrackEvent::TraceForCategory(instances, category, name,\
                                               ##__VA_ARGS__);                  \
           });                                                                  \
     } else {                                                                   \
-      tns::TrackEvent::CallIfCategoryEnabled(                                  \
+      ::perfetto::TrackEvent::CallIfCategoryEnabled(                           \
           PERFETTO_UID(kCatIndex_ADD_TO_PERFETTO_DEFINE_CATEGORIES_IF_FAILS_), \
           [&](uint32_t instances) PERFETTO_NO_THREAD_SAFETY_ANALYSIS {         \
-            tns::TrackEvent::TraceForCategory(                                 \
+            ::perfetto::TrackEvent::TraceForCategory(                          \
                 instances,                                                     \
                 PERFETTO_UID(                                                  \
                     kCatIndex_ADD_TO_PERFETTO_DEFINE_CATEGORIES_IF_FAILS_),    \
